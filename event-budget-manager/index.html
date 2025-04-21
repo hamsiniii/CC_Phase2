@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices Home</title>
+    <style>
+        body {
+            background: url('https://4kwallpapers.com/images/wallpapers/miyamoto-musashi-5k-1920x1080-15210.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .buttons {
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .button {
+            display: inline-block;
+            padding: 20px 40px;
+            margin: 10px;
+            background-color: #3498db;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="buttons">
+        <button class="button" onclick="window.location.href='/test.html'">Event Budget Manager</button>
+        <button class="button" onclick="window.location.href='http://localhost:3001/test.html'">Event Announcement</button>
+		<button class="btn" onclick="location.href='http://localhost:8000/docs'">Gym Subscription</button>
+    </div>
+</body>
+</html>
+

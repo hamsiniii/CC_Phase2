@@ -1,0 +1,85 @@
+version: '3'
+services:
+  calendar:
+    build: ./calendar
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./calendar/events.json:/app/events.json
+
+  announcements:
+    build: ./event-announcement
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./event-announcement/data:/app/data
+      - ./event-announcement/uploads:/app/uploads
+
+  budget:
+    build: ./event-budget-manager
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./event-budget-manager/data:/app/data
+
+  venue:
+    build: ./venue
+    ports:
+      - "3010:3010"
+    volumes:
+      - ./venue/bookings.json:/app/bookings.json
+
+  department-announcement:
+    build: ./department-announcement
+    ports:
+      - "8081:8081"
+    restart: always
+
+  homepage:
+    build: ./homepage
+    ports:
+      - "8080:80"
+
+  # Request Service Integration
+  request-service-backend:
+    build:
+      context: ./request-service/backend
+    container_name: request-service-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=mysql+pymysql://request_user:requestpass@db:3306/requests_db
+    depends_on:
+      - db
+    networks:
+      - my-network
+
+  request-service-frontend:
+    build:
+      context: ./request-service/frontend
+    container_name: request-service-frontend
+    ports:
+      - "8010:80"
+    depends_on:
+      - request-service-backend
+    networks:
+      - my-network
+
+  # Database Service for Request Service
+  db:
+    image: mysql:8.0
+    container_name: request-service-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: requests_db
+      MYSQL_USER: request_user
+      MYSQL_PASSWORD: requestpass
+    ports:
+      - "3307:3306"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge
+

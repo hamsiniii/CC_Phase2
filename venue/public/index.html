@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Venue Booking</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>University Venue Booking</h1>
+  <div class="container">
+  <form id="bookingForm">
+    <label>
+      Event Name:
+      <input type="text" name="event" required />
+    </label>
+
+    <label>
+      Name (POC):
+      <input type="text" name="name" required />
+    </label>
+
+    <label>
+      Phone (POC):
+      <input type="tel" name="phone" required pattern="[0-9]{10}" />
+    </label>
+    
+    <label>
+      Venue:
+      <select name="venue" required>
+        <option value="">-- Select a venue --</option>
+        <option value="Auditorium">Auditorium</option>
+        <option value="Seminar Hall">Seminar Hall</option>
+        <option value="Lab A">Lab A</option>
+        <option value="Lab B">Lab B</option>
+        <option value="Conference Room">Conference Room</option>
+      </select>
+    </label>
+    
+    <label>
+      Date:
+      <input type="date" name="date" required />
+    </label>
+    
+    <label>
+      Start Time:
+      <input type="time" name="startTime" required />
+    </label>
+    
+    <label>
+      End Time:
+      <input type="time" name="endTime" required />
+    </label>
+    
+    <button type="submit">Book Venue</button>
+  </form>
+  </div>
+  <h1>All Bookings</h1>
+  <div class="container">
+<div id="bookingsList"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+

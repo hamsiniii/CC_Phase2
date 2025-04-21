@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Event Budget Manager</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fdfdfd;
+      color: #222;
+    }
+    h1, h2, h3 {
+      color: #222;
+    }
+    .container {
+      max-width: 2000px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    input, select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-right: 0.5rem;
+    }
+    button {
+      background-color: navy;
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #001f4d;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .section {
+      margin-top: 2rem;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+      background-color: #fff;
+    }
+    .color-bar {
+      height: 20px;
+      display: flex;
+      margin-top: 1rem;
+      border-radius: 0.25rem;
+      overflow: hidden;
+    }
+    .paid {
+      background-color: green;
+    }
+    .to-be-paid {
+      background-color: orange;
+    }
+    .remaining {
+      background-color: lightgray;
+    }
+    .overbudget {
+      background-color: red;
+    }
+    .summary {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+    .warning {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Event Budget Manager</h1>
+
+  <!-- Create and Load Event Section -->
+  <div class="form-group">
+    <label for="eventName">Create New Event:</label>
+    <input type="text" id="eventName" placeholder="Enter event name"/>
+    <input type="number" id="eventBudget" placeholder="Enter total budget"/>
+    <button onclick="submitNewEvent()">Create</button>
+  </div>
+
+  <div class="form-group">
+    <label for="eventSelect">Select Event:</label>
+    <select id="eventSelect"></select>
+    <button onclick="loadSelectedEvent()">Load</button>
+    <button onclick="deleteCurrentEvent()">Delete Event</button>
+  </div>
+
+  <!-- Other Sections Hidden Initially -->
+  <div id="eventDetails" style="display: none;">
+    <div class="form-group">
+      <label for="totalBudget">Total Budget:</label>
+      <input type="number" id="totalBudget" placeholder="Enter total budget"/>
+      <button onclick="saveBudget()">Save</button>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="form-group">
+      <h3>Add Section</h3>
+      <input type="text" id="newSectionName" placeholder="Section name"/>
+      <button onclick="addSection()">Add Section</button>
+    </div>
+
+    <div class="summary" id="summary"></div>
+  </div>
+</div>
+
+<script>
+const baseUrl = window.location.origin;
+let currentEvent = null;
+let eventData = {};
+
+async function loadEvents() {
+  const res = await fetch(`${baseUrl}/events`);
+  const data = await res.json();
+  const select = document.getElementById("eventSelect");
+  select.innerHTML = data.events.map(e => `<option value="${e}">${e}</option>`).join("");
+}
+
+async function submitNewEvent() {
+  const name = document.getElementById("eventName").value;
+  const totalBudget = parseFloat(document.getElementById("eventBudget").value);
+  if (!name || isNaN(totalBudget)) return alert("Enter a valid name and budget");
+  
+  const res = await fetch(`${baseUrl}/events`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ eventName: name, totalBudget })
+  });
+  if (res.ok) {
+    await loadEvents();
+    document.getElementById("eventName").value = "";
+    document.getElementById("eventBudget").value = "";
+    alert("Event created!");
+  } else {
+    const data = await res.json();
+    alert("Error: " + data.error);
+  }
+}
+
+async function deleteCurrentEvent() {
+  if (!currentEvent) return alert("No event selected.");
+  const confirmDelete = confirm(`Are you sure you want to delete "${currentEvent}"?`);
+  if (!confirmDelete) return;
+
+  const res = await fetch(`${baseUrl}/event/${currentEvent}`, { method: "DELETE" });
+  if (res.ok) {
+    currentEvent = null;
+    eventData = {};
+    document.getElementById("sections").innerHTML = "";
+    document.getElementById("summary").innerHTML = "";
+    document.getElementById("totalBudget").value = "";
+    document.getElementById("eventDetails").style.display = "none";
+    await loadEvents();
+    alert("Event deleted!");
+  } else {
+    alert("Error deleting event");
+  }
+}
+
+async function loadSelectedEvent() {
+  currentEvent = document.getElementById("eventSelect").value;
+  const res = await fetch(`${baseUrl}/event/${currentEvent}`);
+  const data = await res.json();
+  eventData = data.sections;
+  const budgetInput = document.getElementById("totalBudget");
+  if (eventData._meta && eventData._meta.length > 0) {
+    budgetInput.value = eventData._meta[0].TotalBudget || 0;
+  } else {
+    budgetInput.value = "";
+  }
+  document.getElementById("eventDetails").style.display = "block";
+  renderSections();
+}
+
+async function saveData() {
+  if (!currentEvent) return;
+  const totalBudget = parseFloat(document.getElementById("totalBudget").value || 0);
+  eventData._meta = [{ TotalBudget: totalBudget }];
+  await fetch(`${baseUrl}/event/${currentEvent}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sections: eventData })
+  });
+}
+
+function saveBudget() {
+  saveData();
+  renderSections();
+}
+
+function renderSections() {
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+  let totalPaid = 0, totalUnpaid = 0;
+
+  for (const sectionName in eventData) {
+    if (sectionName === "_meta") continue;
+    const expenses = eventData[sectionName];
+    const div = document.createElement("div");
+    div.className = "section";
+
+    const html = [`<h3>${sectionName} <button onclick="deleteSection('${sectionName}')">Delete</button></h3>`];
+    html.push(`
+      <table>
+        <tr><th>Item</th><th>Vendor</th><th>Price</th><th>Qty</th><th>Total</th><th>Status</th><th>Action</th></tr>
+        ${expenses.map((e, i) => {
+          const cost = (e.Price || 0) * (e.Quantity || 0);
+          if (e.Status === "Paid") totalPaid += cost;
+          else totalUnpaid += cost;
+          return `<tr>
+            <td>${e.Item || ""}</td>
+            <td>${e.Vendor || ""}</td>
+            <td>${e.Price || 0}</td>
+            <td>${e.Quantity || 0}</td>
+            <td>${cost}</td>
+            <td>
+              <select onchange="updateStatus('${sectionName}', ${i}, this)">
+                <option value="Paid" ${e.Status === "Paid" ? "selected" : ""}>Paid</option>
+                <option value="To be Paid" ${e.Status === "To be Paid" ? "selected" : ""}>To be Paid</option>
+              </select>
+            </td>
+            <td><button onclick="deleteExpense('${sectionName}', ${i})">Delete</button></td>
+          </tr>`;
+        }).join("")}
+      </table>
+    `);
+
+    html.push(`
+      <div class="form-group">
+        <input placeholder="Item" id="item-${sectionName}" />
+        <input placeholder="Vendor" id="vendor-${sectionName}" />
+        <input type="number" placeholder="Price" id="price-${sectionName}" />
+        <input type="number" placeholder="Quantity" id="qty-${sectionName}" />
+        <select id="status-${sectionName}">
+          <option value="Paid">Paid</option>
+          <option value="To be Paid">To be Paid</option>
+        </select>
+        <button onclick="addExpense('${sectionName}')">Add</button>
+      </div>
+    `);
+
+    div.innerHTML = html.join("");
+    container.appendChild(div);
+  }
+
+  const totalBudget = parseFloat(document.getElementById("totalBudget").value || 0);
+  const total = totalPaid + totalUnpaid;
+  const remaining = totalBudget - total;
+  const percentPaid = totalBudget ? (totalPaid / totalBudget) * 100 : 0;
+  const percentUnpaid = totalBudget ? (totalUnpaid / totalBudget) * 100 : 0;
+  const percentRemaining = Math.max(0, 100 - percentPaid - percentUnpaid);
+
+  const summary = document.getElementById("summary");
+  summary.innerHTML = `
+    <h3>Summary</h3>
+    <p><strong>Total Budget:</strong> ${totalBudget}</p>
+    <p><strong>Total Spent:</strong> Paid: ${totalPaid}, To be Paid: ${totalUnpaid}</p>
+    <p><strong>Remaining:</strong> ${remaining < 0 ? 0 : remaining} ${remaining < 0 ? `(-${Math.abs(remaining)})` : ""}</p>
+    <p class="warning">${remaining < 0 ? "Over Budget!" : ""}</p>
+    <div class="color-bar ${remaining < 0 ? 'overbudget' : ''}">
+      <div class="paid" style="width: ${percentPaid}%"></div>
+      <div class="to-be-paid" style="width: ${percentUnpaid}%"></div>
+      <div class="remaining" style="width: ${percentRemaining}%"></div>
+    </div>
+  `;
+}
+
+function addExpense(sectionName) {
+  const item = document.getElementById(`item-${sectionName}`).value;
+  const vendor = document.getElementById(`vendor-${sectionName}`).value;
+  const price = parseFloat(document.getElementById(`price-${sectionName}`).value);
+  const qty = parseInt(document.getElementById(`qty-${sectionName}`).value);
+  const status = document.getElementById(`status-${sectionName}`).value;
+
+  if (!item || !vendor || isNaN(price) || isNaN(qty) || !status) return;
+
+  eventData[sectionName] = eventData[sectionName] || [];
+  eventData[sectionName].push({ Item: item, Vendor: vendor, Price: price, Quantity: qty, Status: status });
+  saveData();
+  renderSections();
+}
+
+function deleteSection(sectionName) {
+  delete eventData[sectionName];
+  saveData();
+  renderSections();
+}
+
+function addSection() {
+  const sectionName = document.getElementById("newSectionName").value.trim();
+  if (!sectionName) {
+    alert("Please enter a valid section name.");
+    return;
+  }
+
+  // Initialize the section in eventData
+  eventData[sectionName] = [];
+
+  // Save the updated data and re-render sections
+  saveData();
+  renderSections();
+
+  // Clear the input field
+  document.getElementById("newSectionName").value = "";
+}
+function deleteExpense(sectionName, index) {
+  eventData[sectionName].splice(index, 1);
+  saveData();
+  renderSections();
+}
+
+function updateStatus(sectionName, index, selectElement) {
+  eventData[sectionName][index].Status = selectElement.value;
+  saveData();
+  renderSections();
+}
+
+loadEvents();
+</script>
+</body>
+</html>
+

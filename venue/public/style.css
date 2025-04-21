@@ -1,0 +1,90 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f7f1;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+h1, h2 {
+  text-align: center;
+  color: #15314b;
+  margin-bottom: 20px;
+}
+
+.container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 900px;
+  margin: 0 auto 30px auto;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+input, select {
+  padding: 10px 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 0.95rem;
+}
+
+button {
+  background: #34568B;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #254163;
+  transform: translateY(-2px);
+}
+
+.booking {
+  background: #fefefe;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.booking-details {
+  flex-grow: 1;
+}
+
+.booking strong {
+  color: #222;
+  font-weight: 600;
+}
+
+.booking em {
+  color: #666;
+}
+
+.delete-btn {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: #c62828;
+}
+

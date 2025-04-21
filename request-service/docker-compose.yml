@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: requests_db
+      MYSQL_USER: request_user
+      MYSQL_PASSWORD: requestpass
+    ports:
+      - "3307:3306"
+    networks:
+      - request-network
+
+  backend:
+    build: ./backend
+    container_name: request-service-backend
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      - SQLALCHEMY_DATABASE_URI=mysql+pymysql://request_user:requestpass@db:3306/requests_db
+    networks:
+      - request-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: request-service-frontend
+    ports:
+      - "8010:80"  # <--- this is the important fix
+    depends_on:
+      - backend
+    networks:
+      - request-network
+
+networks:
+  request-network:
+    driver: bridge

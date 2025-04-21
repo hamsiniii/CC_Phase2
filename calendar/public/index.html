@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>College Events Calendar</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="calendar">
+        <div class="month">
+          <i class="fas fa-angle-left prev" onclick="prevMonth()"></i>
+          <div class="date" id="monthYear">Month Year</div>
+          <i class="fas fa-angle-right next" onclick="nextMonth()"></i>
+        </div>
+        <div class="weekdays">
+          <div>Sun</div><div>Mon</div><div>Tue</div>
+          <div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        </div>
+        <div class="days" id="calendarGrid"></div>
+        <div class="goto-today" id="controls">
+          <div class="goto">
+            <input type="text" placeholder="mm/yyyy" class="date-input" id="monthPicker" />
+            <button class="goto-btn" onclick="goToMonth()">Go</button>
+          </div>
+          <button class="today-btn" onclick="goToToday()">Today</button>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="today-date">
+        <div class="event-day" id="eventDay">Day</div>
+        <div class="event-date" id="eventDate">Date</div>
+      </div>
+      <ul class="events" id="eventList"></ul>
+      <div class="add-event-wrapper active">
+        <form id="eventForm" class="add-event-body">
+          <div class="add-event-input">
+            <input type="text" id="eventTitle" placeholder="Event Title" required />
+          </div>
+          <div class="add-event-input">
+            <input type="time" id="startTime" required />
+            <input type="time" id="endTime" required />
+          </div>
+          <div class="add-event-footer">
+            <button type="submit" class="add-event-btn">Add Event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+

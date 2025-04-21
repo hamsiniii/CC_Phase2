@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1744531963628,
+    "event": "Aatmatrisha",
+    "name": "Diya",
+    "phone": "7894561230",
+    "venue": "Auditorium",
+    "date": "2025-02-06",
+    "startTime": "13:42",
+    "endTime": "16:42"
+  },
+  {
+    "id": 1744532090481,
+    "event": "Capstone Meeting",
+    "name": "Hamsini V",
+    "phone": "3214560789",
+    "venue": "Conference Room",
+    "date": "2025-02-06",
+    "startTime": "13:43",
+    "endTime": "18:43"
+  },
+  {
+    "id": 1744699007274,
+    "event": "Last day of college",
+    "name": "kirtamma",
+    "phone": "1543996391",
+    "venue": "Conference Room",
+    "date": "2025-04-25",
+    "startTime": "08:00",
+    "endTime": "23:59"
+  },
+  {
+    "id": 1745245362805,
+    "event": "BoB",
+    "name": "Me",
+    "phone": "1234567890",
+    "venue": "Auditorium",
+    "date": "2025-12-12",
+    "startTime": "12:00",
+    "endTime": "15:00"
+  }
+]
